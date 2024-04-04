@@ -5,12 +5,11 @@ import { BrowserRouter , Route, Switch, useHistory, useRouteMatch } from 'react-
 import LeftMenu from '../../components/molecules/LeftMenu'
 import { historyConfig } from '../../utils/functions'
 import Dashboard from '../Dashboard'
-import MasterData from '../MasterData'
-import User from '../User'
-import InputAdminAccess from '../User/AdminAccess/InputAdminAccess'
-import UpdateAdminAccess from '../User/AdminAccess/UpdateAdminAccess'
-import InputRoleAccess from '../User/RoleAccess/InputRoleAccess'
-import UpdateRoleAccess from '../User/RoleAccess/UpdateRoleAccess'
+import MasterProduct from '../Gudang/MasterProduct'
+import ImportProduct from '../Gudang/MasterProduct/ImportProduct'
+import ScanProduct from '../Gudang/MasterProduct/ScanProduct'
+import StokProduct from '../Gudang/StokProduct'
+import Category from '../Other/Category'
 
 const MainApp = () => {
     const history = useHistory(historyConfig);
@@ -50,23 +49,20 @@ const MainApp = () => {
                             <Route exact path="/dashboard">
                                 <Dashboard />
                             </Route>
-                            <Route exact path="/master-data">
-                                <MasterData />
+                            <Route exact path="/gudang/master-product">
+                                <MasterProduct />
                             </Route>
-                            <Route exact path="/user">
-                                <User />
+                            <Route exact path="/gudang/import-product">
+                                <ImportProduct />
                             </Route>
-                            <Route exact path="/input-admin-access">
-                                <InputAdminAccess />
+                            <Route exact path="/gudang/scan-product">
+                                <ScanProduct />
                             </Route>
-                            <Route exact path="/update-admin-access">
-                                <UpdateAdminAccess />
+                            <Route exact path="/gudang/stok-product">
+                                <StokProduct />
                             </Route>
-                            <Route exact path="/input-role-access">
-                                <InputRoleAccess />
-                            </Route>
-                            <Route exact path="/update-role-access">
-                                <UpdateRoleAccess />
+                            <Route exact path="/other/category">
+                                <Category />
                             </Route>
                         </Switch>
                     </BrowserRouter>

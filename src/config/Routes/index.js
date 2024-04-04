@@ -16,28 +16,19 @@ const Routes = () => {
 				<Route path='/admin/dashboard'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/master-data'>
+				<Route path='/admin/gudang/master-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/main'>
+				<Route path='/admin/gudang/import-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/student'>
+				<Route path='/admin/gudang/scan-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/user'>
+				<Route path='/admin/gudang/stok-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/input-admin-access'>
-					<MainApp/>
-				</Route>
-				<Route path='/admin/update-admin-access'>
-					<MainApp/>
-				</Route>
-				<Route path='/admin/input-role-access'>
-					<MainApp/>
-				</Route>
-				<Route path='/admin/update-role-access'>
+				<Route path='/admin/other/category'>
 					<MainApp/>
 				</Route>
 				{/* <Route path='/:post'>

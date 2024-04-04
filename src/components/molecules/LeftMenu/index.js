@@ -14,13 +14,16 @@ import { Sidebar, Menu, MenuItem, useProSidebar, SubMenu } from "react-pro-sideb
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
 import PeopleOutlinedIcon from "@mui/icons-material/PeopleOutlined";
 import MenuOutlinedIcon from "@mui/icons-material/MenuOutlined";
-import { FaBalanceScale, FaBoxOpen, FaCashRegister, FaDollarSign, FaFileExport, FaFileInvoice, FaHome, FaLayerGroup, FaMoneyBill, FaMoneyBillWave, FaNewspaper, FaQrcode, FaWarehouse } from 'react-icons/fa';
+import { FaBalanceScale, FaBoxOpen, FaCashRegister, FaDollarSign, FaFileExport, FaFileInvoice, FaHome, FaLayerGroup, FaList, FaMoneyBill, FaNewspaper, FaQrcode, FaServer, FaWarehouse } from 'react-icons/fa';
+import Skeleton from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
 const LeftMenu = () => {
 	const history = useHistory(historyConfig);
     const dispatch = useDispatch();
     const containerRef = useRef(null);
 	const [cookies, setCookie, removeCookie] = useCookies(['user']);
+	const [LoadingMenuSidebar, setLoadingMenuSidebar] = useState(false)
 	const [ListMenuSidebar, setListMenuSidebar] = useState([])
 	const [Loading, setLoading] = useState(false)
 	const { form }=useSelector(state=>state.PaketReducer);
@@ -78,8 +81,6 @@ const LeftMenu = () => {
 		var CookieParamKey = getCookie("paramkey");
         var CookieUsername = getCookie("username");
 
-		console.log(CookieParamKey)
-
 		var requestBody = JSON.stringify({
 			"Username": CookieUsername,
 			"ParamKey": CookieParamKey,
@@ -90,12 +91,10 @@ const LeftMenu = () => {
 			"Order": ""
 		});
 
-		console.log(requestBody)
+		setLoadingMenuSidebar(true)
 
 		var url = paths.URL_API_ADMIN + 'Menu';
 		var Signature  = generateSignature(requestBody)
-
-		setLoading(true)
 
 		fetch(url, {
 			method: "POST",
@@ -109,7 +108,7 @@ const LeftMenu = () => {
 		.then(response => response.json())
 		.then((data) => {
 
-			setLoading(false)
+			setLoadingMenuSidebar(false)
 
 			if (data.ErrorCode === "0") {
 				setListMenuSidebar(data.Result)
@@ -139,6 +138,10 @@ const LeftMenu = () => {
 			}
 		});
     }
+
+	const gotoMenu = () => {
+		window.location.href="/admin/master-products"
+	}
     
     return (
         <div style={{ display: 'flex', height: '100vh', overflow: 'scroll initial' }}>
@@ -211,7 +214,10 @@ const LeftMenu = () => {
 						<h5>SIGAP</h5>
 					</MenuItem>
 
-					{ListMenuSidebar.length > 0 && ListMenuSidebar.map((item,index) => {
+					{LoadingMenuSidebar ?
+					<Skeleton count={ListMenuSidebar.length} />
+					:
+					ListMenuSidebar.length > 0 && ListMenuSidebar.map((item,index) => {
 						var Icon = ""
 						if (item.Menu === "Dashboard") {
 							Icon = <FaHome />
@@ -221,6 +227,8 @@ const LeftMenu = () => {
 							Icon = <FaCashRegister />
 						} else if (item.Menu === "Keuangan") {
 							Icon = <FaMoneyBill />
+						} else if (item.Menu === "Lainnya") {
+							Icon = <FaServer />
 						}
 						return item.SubMenu.length > 0 ? 
 						<SubMenu icon={Icon} label={item.Menu} 
@@ -228,9 +236,9 @@ const LeftMenu = () => {
 						>
 							{item.SubMenu.map((item2,index2) => {
 								var Icon2 = ""
-								if (item2.Menu === "Master Data") {
+								if (item2.Menu === "Master Product") {
 									Icon2 = <FaLayerGroup />
-								} else if (item2.Menu === "Stok Barang") {
+								} else if (item2.Menu === "Stok Product") {
 									Icon2 = <FaBoxOpen />
 								} else if (item2.Menu === "Scan Product") {
 									Icon2 = <FaQrcode />
@@ -244,8 +252,10 @@ const LeftMenu = () => {
 									Icon2 = <FaDollarSign />
 								} else if (item2.Menu === "Neraca") {
 									Icon2 = <FaBalanceScale />
+								} else if (item2.Menu === "Category") {
+									Icon2 = <FaList />
 								}
-								return item.Id === item2.ParentId && <a href={item2.Href} style={{  textDecoration:'none', color:'#000000' }}><MenuItem icon={Icon2}>{item2.Menu}</MenuItem></a>
+								return item.Id === item2.ParentId && <a href={item2.Href} style={{ textDecoration:'none', color:'#000000' }}><MenuItem icon={Icon2}>{item2.Menu}</MenuItem></a>
 							})}
 						</SubMenu>
 						:

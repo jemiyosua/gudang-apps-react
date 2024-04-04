@@ -1,22 +1,24 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
-import { Header, Footer, Input, Button, Gap, Dropdown } from '../../components';
+import { Header, Footer, Input, Button, Gap, Dropdown } from '../../../components';
 import './Tab.css'
 import { useDispatch } from 'react-redux';
-import { AlertMessage, paths } from '../../utils'
-import { historyConfig, generateSignature, fetchStatus } from '../../utils/functions';
-import { setForm } from '../../redux';
+import { AlertMessage, paths } from '../../../utils'
+import { historyConfig, generateSignature, fetchStatus } from '../../../utils/functions';
+import { setForm } from '../../../redux';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
-import LabelTH from '../../components/molecules/LabelTH'
+import LabelTH from '../../../components/molecules/LabelTH'
 import { Col, Row, Form, ListGroup, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faUserPlus, faArrowLeft, faArrowLeftRotate, faArrowsRotate, faEllipsisVertical, faUserPen, faPercent, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faUserPlus, faArrowLeft, faArrowLeftRotate, faArrowsRotate, faEllipsisVertical, faUserPen, faPercent, faGraduationCap, faLayerGroup, faFileExcel, faFileImport } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactPaginate from 'react-paginate';
+import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
+import 'react-loading-skeleton/dist/skeleton.css'
 
-const MasterData = () => {
+const Category = () => {
     const history = useHistory(historyConfig);
     const dispatch = useDispatch();
     const containerRef = useRef(null);
@@ -29,8 +31,12 @@ const MasterData = () => {
     const [isHovering, setIsHovering] = useState(false)
     const [isHoveringNoEdit, setIsHoveringNoEdit] = useState(false)
 
-	const [ListSiswa, setListSiswa] = useState([])
+	const [ListKategori, setListKategori] = useState([])
     const [IdStatus, setIdStatus] = useState("")
+    const [KategoriId, setKategoriId] = useState("")
+    const [KategoriNama, setKategoriNama] = useState("")
+    const [Status, setStatus] = useState("")
+
     const [Filter, setFilter] = useState("")
     const [FilterPopup, setFilterPopup] = useState(false)
     const [Search, setSearch] = useState("")
@@ -38,7 +44,6 @@ const MasterData = () => {
     const [TotalData, setTotalData] = useState(0)
     const [TotalPages, setTotalPages] = useState(0)
     const [Paging, setPaging] = useState("")
-    const [RoleAccess, setRoleAccess] = useState("")
 	
 	const [ShowAlert, setShowAlert] = useState(true)
     const [SessionMessage, setSessionMessage] = useState("")
@@ -67,10 +72,10 @@ const MasterData = () => {
         } else {
             dispatch(setForm("ParamKey",CookieParamKey))
             dispatch(setForm("Username",CookieUsername))
-            dispatch(setForm("PageActive","Master Data"))
+            dispatch(setForm("PageActive","Category"))
 
-            setRoleAccess(CookieRole)
-            getListItem(1, "")
+            // setRoleAccess(CookieRole)
+            getListcategory(1, "", "", "")
         }
 
     },[])
@@ -122,27 +127,22 @@ const MasterData = () => {
         // setEditablePrice(false)
     };
 
-    const getListItem = (Page, Position) => {
+    const getListcategory = (Page, Position, SearchValue, SearchType) => {
 
-        var SearchNama = ""
+        var SearchKategoriNama = ""
         var Status = ""
 
         if (Position === "reset-filter") {
-            setFilter("")
-            setSearch("")
-            setFilterStatus("")
+            // setFilter("")
+            // setSearch("")
+            // setFilterStatus("")
         } else {
-            if (Filter !== "") {
-                if (Filter === "name") {
-                    SearchNama = Search
-                }
-            }
-
-            if (FilterStatus !== "") {
-                if (FilterStatus === "tidak-aktif") {
-                    Status = "0"
-                } else  {
-                    Status = "1"
+            if (SearchType !== "") {
+                if (SearchType === "nama_kategori") {
+                    SearchKategoriNama = SearchValue
+                } else if (SearchType === "status") {
+                    setStatus(SearchValue)
+                    Status = SearchValue
                 }
             }
         }
@@ -154,13 +154,15 @@ const MasterData = () => {
             "UserName": CookieUsername,
             "ParamKey": CookieParamKey,
             "Method": "SELECT",
+            "NamaKategori": SearchKategoriNama,
+            "StatusKategori": Status,
             "Page": Page,
             "RowPage": 20,
-            "OrderBy": "tgl_input",
+            "OrderBy": "dbmp.tgl_input",
             "Order": "DESC"
         });
 
-		var url = paths.URL_API_ADMIN + 'MasterItem';
+		var url = paths.URL_API_ADMIN + 'Category';
 		var Signature  = generateSignature(requestBody)
 
 		setLoading(true)
@@ -179,7 +181,7 @@ const MasterData = () => {
 			setLoading(false)
 
 			if (data.ErrorCode === "0") {
-				setListSiswa(data.Result)
+				setListKategori(data.Result)
                 setTotalData(data.TotalData)
                 setTotalPages(data.TotalPage)
 			} else {
@@ -208,7 +210,7 @@ const MasterData = () => {
 		});
     }
 
-    const updateStatusUser = (IdUserlogin, Status) => {
+    const updateStatusKategori = (IdKategori, Status) => {
 
         var vStatus = ""
         if (Status === "0") {
@@ -217,8 +219,8 @@ const MasterData = () => {
             vStatus = "0"
         }
 
-        if (IdUserlogin === 0) {
-            setErrorMessageAlert("IdUserlogin tidak boleh kosong");
+        if (IdKategori === 0) {
+            setErrorMessageAlert("Id Kategori tidak boleh kosong");
             setShowAlert(true);
             return false;
         }
@@ -227,14 +229,14 @@ const MasterData = () => {
         var CookieUsername = getCookie("username");
 
 		var requestBody = JSON.stringify({
-			"UsernameSession": CookieUsername,
+			"Username": CookieUsername,
 			"ParamKey": CookieParamKey,
 			"Method": "UPDATE",
-            "Id": IdUserlogin,
+            "Id": IdKategori,
             "Status": vStatus
 		});
 
-		var url = paths.URL_API_ADMIN + 'UserLogin';
+		var url = paths.URL_API_ADMIN + 'Category';
 		var Signature  = generateSignature(requestBody)
 
 		setLoadingStatus(true)
@@ -281,7 +283,7 @@ const MasterData = () => {
     }
 
     const handleChangeStatus = (Id, Status) => {
-        var vListUsesr = ListSiswa
+        var vListKategori = ListKategori
 
         var vStatus = ""
         if (Status === "0") {
@@ -290,13 +292,13 @@ const MasterData = () => {
             vStatus = "0"
         }
 
-        vListUsesr.map((item,index) => {
+        vListKategori.map((item,index) => {
             if (item.Id === Id) {
-                vListUsesr[index].Status = vStatus
-                updateStatusUser(Id, Status)
+                vListKategori[index].Status = vStatus
+                updateStatusKategori(Id, Status)
             }
         })
-        getListItem(vListUsesr)
+        setListKategori(vListKategori)
     }
 
 	const logout = ()=>{
@@ -313,18 +315,17 @@ const MasterData = () => {
     }
 
     const handlePageClick = (data) => {
-
         let currentPage = data.selected + 1
         setPaging(data.selected)
-        setListSiswa([])
-        getListItem(currentPage, "")
+        setListKategori([])
+        getListcategory(currentPage, "", "", "")
     }
     
     return (
 		<div className="main-page" style={{ backgroundColor:'#F6FBFF' }}>
             <div className="content-wrapper-2" style={{ backgroundColor:'#F6FBFF', width:'100%' }} >
                 <div className="blog-post">
-                    <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faGraduationCap}/> Master Data Item</div>
+                    <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Master Category</div>
                     {/* <p style={{ margin:0 }}>Here's for all Admin from SIAM platform.</p> */}
 
                     {SessionMessage !== "" ?
@@ -387,7 +388,7 @@ const MasterData = () => {
                     <div>
                         <a href='master-data'>
                             <button role="tab" aria-controls="merchant-list">
-                                <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Kelas 10</div>
+                                <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Master Category</div>
                             </button>
                         </a>
                     </div>
@@ -395,91 +396,48 @@ const MasterData = () => {
                     <div style={{ backgroundColor:'white', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20 }}>
 
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                            <div style={{ display:'flex', justifyContent:'flex-start' }}>
-                                <div style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => getListItem(1, "")}>
-                                    <FontAwesomeIcon icon={faArrowsRotate} style={{ height:10, width:30 }} />
-                                </div>
-                                <div style={{ paddingRight:10 }} />
-                                <div 
-                                    style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
-                                    onClick={() => setFilterPopup(!FilterPopup)}>
-                                    <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faFilter} /> Filter Data</div>
-                                </div>
-                            </div>
-                            <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => history.push('input-admin-access')}>
-                                <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faUserPlus} /> Tambah Siswa</div>
+                            <div 
+                                style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
+                                onClick={() => {
+                                    setStatus("")
+                                    setKategoriId("")
+                                    getListcategory(1, "", "", "")
+                                }}>
+                                <FontAwesomeIcon icon={faArrowsRotate} style={{ height:15, width:25 }} />
                             </div>
                         </div>
-
-                        {FilterPopup &&
-                        <div>
-                            <div style={{ paddingBottom:20 }} />
-                            <div style={{ borderRadius:10, backgroundColor:'#FFFFFF', paddingTop:25, paddingLeft:25, paddingRight:25, position:'absolute', zIndex:100, border:'.5px solid', height:300 }} >
-                                <div style={{ color:'#004372', fontWeight:'bold', fontSize:13 }}>Sort By</div>
-                                <div style={{ marginBottom:10 }}></div>
-                                <Row style={{ alignItems:'center' }}>
-                                    <Col xs={3} md={6} lg={6} style={{ paddingLeft:6 }}>
-                                        <Dropdown
-                                            onChange={(event) => setFilter(event.target.value) }>
-                                            <option value="global">Select Filter</option>
-                                            <option value="name" selected={Filter === "name"}>Name</option>
-                                        </Dropdown>
-                                    </Col>
-                                    <Col xs={3} md={6} lg={6} style={{ paddingLeft:6 }}>
-                                        <Input
-                                            placeHolder="Input Search"
-                                            value={Search}
-                                            style={{ borderColor:'silver' }}
-                                            onChange={event => setSearch(event.target.value)}
-                                        />
-                                    </Col>
-                                </Row>
-
-                                <hr></hr>
-                            
-                                <div style={{ marginBottom:10 }}></div>
-                                <div style={{ color:'#004372', fontWeight:'bold', fontSize:13 }}>Status</div>
-                                <div style={{ marginBottom:10 }}></div>
-
-                                <Row>
-                                    <Col xs={3} md={6} lg={6} style={{ paddingRight:6 }}>
-                                        <Dropdown
-                                            onChange={(event) => setFilterStatus(event.target.value) }>
-                                            <option value="">Select Filter</option>
-                                            <option value="aktif" selected={FilterStatus === "aktif"}>Aktif</option>
-                                            <option value="tidak-aktif" selected={FilterStatus === "tidak-aktif"}>Tidak Aktif</option>
-                                        </Dropdown>
-                                    </Col>
-                                </Row>
-
-                                <div style={{ bottom:10, right:10, position:'absolute', display:'flex', alignItems:'center' }}>
-                                    <div style={{ cursor:'pointer' }} onClick={() => {
-                                        setFilterPopup(false)
-                                        getListItem(1, "reset-filter")
-                                        // setPaging(0)
-                                    }}>Reset Filter</div>
-                                    <div style={{ marginLeft:10 }}></div>
-                                    <div style={{ backgroundColor:'#004372', width:100, height:30, borderRadius:10, color:'#FFFFFF', fontSize:13, cursor:'pointer', textAlign:'center' }}>
-                                        <div style={{ marginTop:4, fontWeight:'bold' }} onClick={() => {
-                                            getListItem(1, "")
-                                            setFilterPopup(false)
-                                            // setPaging(0)
-                                            }}>Apply Now</div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        }
                         
                         <hr/>
 
                         <Table striped bordered hover responsive cellspacing="0" cellpadding="10" style={{ fontSize:13, borderColor:'white', width:'100%' }}>
                             <Thead>
                                 <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
-                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH></LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Name</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Username</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Access</LabelTH></Th>
+                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}>
+                                        <Dropdown onChange={(event) => getListcategory(1, "", event.target.value, "status") }>
+                                            <option value="">Filter Status</option>
+                                            <option value="1" selected={Status === "1"}>Aktif</option>
+                                            <option value="0" selected={Status === "0"}>Tidak Aktif</option>
+                                        </Dropdown>
+                                    </Th>
+                                    <Th className="tabelHeader">
+                                        <Input
+                                            required
+                                            value={KategoriNama}
+                                            onChange={event => setKategoriNama(event.target.value)}
+                                            onKeyDown={event => {
+                                                if (event.key === 'Enter') {
+                                                    getListcategory(1, "", event.target.value, "nama_kategori")
+                                                    event.target.blur()
+                                                }
+                                            }}
+                                        />
+                                    </Th>
+                                </Tr>
+                            </Thead>
+                            <Thead>
+                                <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
+                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH>Status</LabelTH></Th>
+                                    <Th className="tabelHeader"><LabelTH>Nama Kategori</LabelTH></Th>
                                     <Th className="tabelHeader"><LabelTH>Tanggal Input</LabelTH></Th>
                                     <Th className="tabelHeader"><LabelTH>Action</LabelTH></Th>
                                 </Tr>
@@ -487,14 +445,15 @@ const MasterData = () => {
                             <Tbody>
                                 {Loading ? 
                                 <Tr>
-                                    <td colSpan="6" align="center">
+                                    <td colSpan="9" align="center">
                                         <div className="loader-container">
                                             <div className="spinner" />
                                         </div>
+                                        {/* <Skeleton count={ListProduk.length} /> */}
                                     </td>
                                 </Tr>
                                 :
-                                ListSiswa.length > 0 ? ListSiswa.map((item,index)=>{
+                                ListKategori.length > 0 ? ListKategori.map((item,index)=>{
                                 return <Tr style={{
                                     marginBottom:20,
                                     backgroundColor:item.Status === "0" ? '#EEEEEE' : 'white',
@@ -518,22 +477,20 @@ const MasterData = () => {
                                         <Td style={{ paddingTop:20, paddingBottom:20, color:'#546E7A', borderTopLeftRadius:10, borderBottomLeftRadius:10 }} onMouseOut={handleMouseOut}>
                                             <Form>
                                                 <Form.Check
-                                                    disabled={item.Username !== "admin_siam" ? false : true}
+                                                    disabled={item.UsernameLogin !== "admin_gudang" ? false : true}
                                                     type="switch"
                                                     id={item.Id}
-                                                    checked={item.Status === "0" ? false : true}
+                                                    checked={item.StatusKategori === "0" ? false : true}
                                                     onChange={() => {
                                                         setIdStatus(item.Id)
-                                                        handleChangeStatus(item.Id, item.Status) 
+                                                        handleChangeStatus(item.Id, item.Status)
                                                     }}
                                                 />
                                             </Form>
                                         </Td>
                                         }
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.Nama}</td>
-                                        <td style={{ paddingTop:20, paddingBottom:20, color:item.Id === IdIndex && isHoveringNoEdit && item.Status !== 0 ? '#004372' : '#546E7A', textAlign:'left' }}>{item.Username}</td>
-                                        <td style={{ textAlign:'left' }}>{item.Role}</td>                             
-                                        <td style={{ textAlign:'left' }}>{item.TanggalInput}</td>
+                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.NamaKategori}</td>
+                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalInput}</td>
                                         <td>
                                             {item.Username !== "admin_siam" &&
                                             <FontAwesomeIcon icon={faUserPen} style={{ height:20, width:20, cursor:'pointer' }} onClick={() => {
@@ -542,7 +499,7 @@ const MasterData = () => {
                                             }}/>}
                                         </td>
                                     </Tr>;
-                                }) : <Tr><td colSpan="6" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
+                                }) : <Tr><td colSpan="9" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
                                 }
                             </Tbody>
                         </Table>
@@ -594,4 +551,4 @@ const MasterData = () => {
     )
 }
 
-export default MasterData;
+export default Category;
