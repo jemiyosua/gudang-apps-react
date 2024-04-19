@@ -397,19 +397,10 @@ const ScanProduct = () => {
             </SweetAlert>
             :""}
             
-            <div>
-                <button role="tab" aria-controls="merchant-list">
-                    <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Scan Product</div>
-                </button>
-            </div>
-            
-            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, padding:20 }}>
-                
-                <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20, paddingTop:30 }}>
-                    <div style={{ color:'#004372', cursor:'pointer' }} onClick={() => history.push('/gudang/master-product')}><FontAwesomeIcon icon={faArrowLeft} /> Back</div>
-                </div>
+            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25 }}>
 
                 <hr/>
+
                 <div style={{ display:'flex', justifyContent:'flex-end', alignItems:'center' }}>
                     {LoadingSave ?
                     <div className="loader-container-small">

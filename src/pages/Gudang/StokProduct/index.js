@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
 import { Header, Footer, Input, Button, Gap, Dropdown, TextArea } from '../../../components';
-import './Tab.css'
 import { useDispatch } from 'react-redux';
 import { AlertMessage, paths } from '../../../utils'
 import { historyConfig, generateSignature, fetchStatus } from '../../../utils/functions';
@@ -364,7 +363,7 @@ const StokProduct = () => {
 		<div className="main-page" style={{ backgroundColor:'#F6FBFF' }}>
             <div className="content-wrapper-2" style={{ backgroundColor:'#F6FBFF', width:'100%' }} >
                 <div className="blog-post">
-                    <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Stok Product</div>
+                    {/* <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Stok Product</div> */}
                     {/* <p style={{ margin:0 }}>Here's for all Admin from SIAM platform.</p> */}
 
                     {SessionMessage !== "" ?
@@ -440,7 +439,7 @@ const StokProduct = () => {
                     </SweetAlert>
                     :""}
                     
-                    <Gap height={20} />
+                    {/* <Gap height={20} />
                     
                     <div>
                         <a href='stok-product'>
@@ -448,9 +447,9 @@ const StokProduct = () => {
                                 <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Stok Product</div>
                             </button>
                         </a>
-                    </div>
+                    </div> */}
                     
-                    <div style={{ backgroundColor:'white', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20 }}>
+                    <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderTopLeftRadius:25, borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20 }}>
 
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                             <div style={{ display:'flex', justifyContent:'flex-start' }}>
@@ -467,12 +466,11 @@ const StokProduct = () => {
                                     <FontAwesomeIcon icon={faArrowsRotate} style={{ height:15, width:25 }} />
                                 </div>
                             </div>
-                            <div style={{  display:'flex', alignItems:'center'  }}>
+                            {/* <div style={{  display:'flex', alignItems:'center'  }}>
                                 <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => history.push('scan-product')}>
                                     <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faBarcode} /> Scan Product</div>
                                 </div>
-                            </div>
-                            
+                            </div> */}
                         </div>
                         
                         <hr/>

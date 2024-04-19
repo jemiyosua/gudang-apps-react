@@ -5,11 +5,12 @@ import { BrowserRouter , Route, Switch, useHistory, useRouteMatch } from 'react-
 import LeftMenu from '../../components/molecules/LeftMenu'
 import { historyConfig } from '../../utils/functions'
 import Dashboard from '../Dashboard'
-import MasterProduct from '../Gudang/MasterProduct'
+import Gudang from '../Gudang'
+import Kasir from '../Kasir'
+import Keuangan from '../Keuangan'
+import Other from '../Other'
 import ImportProduct from '../Gudang/MasterProduct/ImportProduct'
 import ScanProduct from '../Gudang/MasterProduct/ScanProduct'
-import StokProduct from '../Gudang/StokProduct'
-import Category from '../Other/Category'
 
 const MainApp = () => {
     const history = useHistory(historyConfig);
@@ -26,7 +27,7 @@ const MainApp = () => {
 
     useEffect(()=>{
         // alert("mainapp")
-        document.title = "Sistem Informasi Akademik Methodist 1";
+        document.title = "Sistem Informasi Gudang dan Perhitungan";
         // if(cookies.CookieParamKey==null || cookies.CookieParamKey=="" ||
         // cookies.ckUI==null || cookies.ckUI==""){
         //     alert("Session anda telah habis. Silahkan login kembali.");
@@ -49,20 +50,23 @@ const MainApp = () => {
                             <Route exact path="/dashboard">
                                 <Dashboard />
                             </Route>
-                            <Route exact path="/gudang/master-product">
-                                <MasterProduct />
+                            <Route exact path="/gudang">
+                                <Gudang />
+                            </Route>
+                            <Route exact path="/kasir">
+                                <Kasir />
+                            </Route>
+                            <Route exact path="/keuangan">
+                                <Keuangan />
+                            </Route>
+                            <Route exact path="/other">
+                                <Other />
                             </Route>
                             <Route exact path="/gudang/import-product">
                                 <ImportProduct />
                             </Route>
                             <Route exact path="/gudang/scan-product">
                                 <ScanProduct />
-                            </Route>
-                            <Route exact path="/gudang/stok-product">
-                                <StokProduct />
-                            </Route>
-                            <Route exact path="/other/category">
-                                <Category />
                             </Route>
                         </Switch>
                     </BrowserRouter>

@@ -171,24 +171,17 @@ const ImportProduct = () => {
                 if (sheets.length) {
                     const rows = utils.sheet_to_json(wb.Sheets[sheets[0]]);
                     rows.map((item,index) => {
+                        // const date = rows[index].tgl_expired
+                        // const dateValue = utils.format_date(date, 'yyyy/mm/dd');
                         rows[index]["user_input"] = getCookie("username")
+                        // rows[index]["tgl_expired"] = dateValue
                     })
+                    
                     setListProduk(rows)
                 }
             }
             reader.readAsArrayBuffer(file);
         }
-    }
-
-    const handleChangeCategory = (produkId, produkKategori, indexProduk) => {
-        var vListProdukImport = ListProduk
-
-        vListProdukImport.map((item,index) => {
-            if (produkId === item.produk_id) {
-                vListProdukImport[indexProduk]["kategori_produk"] = produkKategori
-            }
-        })
-        setListProduk(vListProdukImport)
     }
 
     const handleDeleteProduk = (index) => {
@@ -286,19 +279,16 @@ const ImportProduct = () => {
             </SweetAlert>
             :""}
             
-            <div>
+            {/* <div>
                 <button role="tab" aria-controls="merchant-list">
                     <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Import Product</div>
                 </button>
-            </div>
+            </div> */}
             
-            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, padding:20 }}>
-                
-                <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20, paddingTop:30 }}>
-                    <div style={{ color:'#004372', cursor:'pointer' }} onClick={() => history.push('/gudang/master-product')}><FontAwesomeIcon icon={faArrowLeft} /> Back</div>
-                </div>
+            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25 }}>
 
                 <hr/>
+
                 <div style={{ display:'flex', justifyContent:'space-between' }}>
                     <input 
                         type="file" 
@@ -338,6 +328,7 @@ const ImportProduct = () => {
                             <Th className="tabelHeader"><LabelTH>Quantity</LabelTH></Th>
                             <Th className="tabelHeader"><LabelTH>Jumlah (isi)</LabelTH></Th>
                             <Th className="tabelHeader"><LabelTH>Total (Rp)</LabelTH></Th>
+                            <Th className="tabelHeader"><LabelTH>Tanggal Expired (YYYY/MM/DD)</LabelTH></Th>
                             <Th className="tabelHeader"><LabelTH>User Input</LabelTH></Th>
                             <Th className="tabelHeader"><LabelTH>Action</LabelTH></Th>
                         </Tr>
@@ -354,13 +345,7 @@ const ImportProduct = () => {
                                 <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>{item.qty}</td>
                                 <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>{item.isi}</td>
                                 <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>{item.total}</td>
-                                {/* <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>
-                                    <Dropdown onChange={event => handleChangeCategory(item.produk_id, event.target.value, index)}>
-                                        <option value="">Kategori Produk</option>
-                                        <option value="1">Makanan</option>
-                                        <option value="2">Minuman</option>
-                                    </Dropdown>
-                                </td> */}
+                                <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>{item.tgl_expired}</td>
                                 <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }}>{item.user_input}</td>
                                 <td>
                                     <FontAwesomeIcon icon={faTrash} style={{ height:20, width:20, cursor:'pointer' }} onClick={() => {

@@ -2,7 +2,6 @@ import React, { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
 import { Header, Footer, Input, Button, Gap, Dropdown, TextArea } from '../../../components';
-import './Tab.css'
 import { useDispatch } from 'react-redux';
 import { AlertMessage, paths } from '../../../utils'
 import { historyConfig, generateSignature, fetchStatus } from '../../../utils/functions';
@@ -18,6 +17,8 @@ import ReactPaginate from 'react-paginate';
 import 'react-loading-skeleton/dist/skeleton.css'
 import { FaPenSquare, FaTrash } from 'react-icons/fa';
 import { Markup } from 'interweave'
+import ImportProduct from '../MasterProduct/ImportProduct'
+import ScanProduct from '../MasterProduct/ScanProduct'
 
 const MasterProduct = () => {
     const history = useHistory(historyConfig);
@@ -42,6 +43,8 @@ const MasterProduct = () => {
     const [UserInput, setUserInput] = useState("")
     const [Status, setStatus] = useState("")
     const [ModalUpdate, setModalUpdate] = useState("")
+    const [PageImport, setPageImport] = useState(false)
+    const [PageScan, setPageScan] = useState(false)
 
     const [IdProdukModalUpdate, setIdProdukModalUpdate] = useState("")
     const [NamaProdukModalUpdate, setNamaProdukModalUpdate] = useState("")
@@ -546,7 +549,7 @@ const MasterProduct = () => {
 		<div className="main-page" style={{ backgroundColor:'#F6FBFF' }}>
             <div className="content-wrapper-2" style={{ backgroundColor:'#F6FBFF', width:'100%' }} >
                 <div className="blog-post">
-                    <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Master Product</div>
+                    {/* <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Master Product</div> */}
                     {/* <p style={{ margin:0 }}>Here's for all Admin from SIAM platform.</p> */}
 
                     {SessionMessage !== "" ?
@@ -636,7 +639,7 @@ const MasterProduct = () => {
                     </SweetAlert>
                     :""}
                     
-                    <Gap height={20} />
+                    {/* <Gap height={20} />
                     
                     <div>
                         <a href='master-data'>
@@ -644,290 +647,313 @@ const MasterProduct = () => {
                                 <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Master Product</div>
                             </button>
                         </a>
-                    </div>
+                    </div> */}
                     
                     <div style={{ backgroundColor:'white', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20 }}>
 
-                        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                            <div style={{ display:'flex', justifyContent:'flex-start' }}>
-                                <div 
-                                    style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
-                                    onClick={() => {
-                                        setStatus("")
-                                        setProdukId("")
-                                        setNamaProduk("")
-                                        setKategoriProduk("")
-                                        setUserInput("")
-                                        getListProduk(1, "", "", "")
-                                    }}>
-                                    <FontAwesomeIcon icon={faArrowsRotate} style={{ height:15, width:25 }} />
-                                </div>
+                        {PageImport ?
+                        <>
+                            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20, paddingTop:30 }}>
+                                <div style={{ color:'#004372', cursor:'pointer' }} onClick={() => setPageImport(false)}><FontAwesomeIcon icon={faArrowLeft} /> Back</div>
                             </div>
-                            <div style={{  display:'flex', alignItems:'center'  }}>
-                                <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => history.push('scan-product')}>
-                                    <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faBarcode} /> Scan Product</div>
-                                </div>
-                                <div style={{  marginLeft:10  }} />
-                                <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => history.push('import-product')}>
-                                    <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faFileImport} /> Import Product</div>
-                                </div>
+                            <ImportProduct />
+                        </>
+                        : PageScan ?
+                        <>
+                            <div style={{ backgroundColor:'#FFFFFF', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20, paddingTop:30 }}>
+                                <div style={{ color:'#004372', cursor:'pointer' }} onClick={() => setPageScan(false)}><FontAwesomeIcon icon={faArrowLeft} /> Back</div>
                             </div>
-                            
-                        </div>
-                        
-                        <hr/>
-
-                        <Table striped bordered hover responsive cellspacing="0" cellpadding="10" style={{ fontSize:13, borderColor:'white', width:'100%' }}>
-                            <Thead>
-                                <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
-                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}>
-                                        <Dropdown onChange={(event) => getListProduk(1, "", event.target.value, "status") }>
-                                            <option value="">Filter Status</option>
-                                            <option value="1" selected={Status === "1"}>Aktif</option>
-                                            <option value="0" selected={Status === "0"}>Tidak Aktif</option>
-                                        </Dropdown>
-                                    </Th>
-                                    <Th className="tabelHeader">
-                                        <Input
-                                            required
-                                            value={ProdukId}
-                                            onChange={event => setProdukId(event.target.value)}
-                                            onKeyDown={event => {
-                                                if (event.key === 'Enter') {
-                                                    getListProduk(1, "", event.target.value, "produk_id")
-                                                    event.target.blur()
-                                                }
-                                            }}
-                                        />
-                                    </Th>
-                                    <Th className="tabelHeader">
-                                        <Input
-                                            required
-                                            value={NamaProduk}
-                                            onChange={event => setNamaProduk(event.target.value)}
-                                            onKeyDown={event => {
-                                                if (event.key === 'Enter') {
-                                                    getListProduk(1, "", event.target.value, "nama_produk")
-                                                    event.target.blur()
-                                                }
-                                            }}
-                                            onFocus={() => setNamaProduk("")}
-                                        />
-                                    </Th>
-                                    <Th className="tabelHeader">
-                                        <Dropdown onChange={event => {
-                                            getListProduk(1, "", event.target.value, "kategori_produk")
-                                            setKategoriProduk(event.target.value)
+                            <ScanProduct />
+                        </>
+                        :
+                        <>
+                            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                                <div style={{ display:'flex', justifyContent:'flex-start' }}>
+                                    <div 
+                                        style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
+                                        onClick={() => {
+                                            setStatus("")
+                                            setProdukId("")
+                                            setNamaProduk("")
+                                            setKategoriProduk("")
+                                            setUserInput("")
+                                            getListProduk(1, "", "", "")
                                         }}>
-                                        <option value="">Pilih Kategori</option>
-                                        {ListKategoriProduk.length > 0 && ListKategoriProduk.map((item,index) => {
-                                            return <option value={item.Id}>{item.NamaKategori}</option>
-                                        })}
-                                        </Dropdown>
-                                    </Th>
-                                    <Th className="tabelHeader">
-                                        <Input
-                                            required
-                                            value={UserInput}
-                                            onChange={event => setUserInput(event.target.value)}
-                                            onKeyDown={event => {
-                                                if (event.key === 'Enter') {
-                                                    getListProduk(1, "", event.target.value, "user_input")
-                                                    event.target.blur()
-                                                }
-                                            }}
-                                        />
-                                    </Th>
-                                    <Th className="tabelHeader"></Th>
-                                    <Th className="tabelHeader"></Th>
-                                    <Th className="tabelHeader"></Th>
-                                </Tr>
-                            </Thead>
-                            <Thead>
-                                <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
-                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH>Status</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Produk Id</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Nama Produk</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Kategori Produk</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>User Input</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Tanggal Update</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Tanggal Input</LabelTH></Th>
-                                    <Th className="tabelHeader" colSpan={2}><LabelTH>Action</LabelTH></Th>
-                                </Tr>
-                            </Thead>
-                            <Tbody>
-                                {Loading ? 
-                                <Tr>
-                                    <td colSpan="9" align="center">
-                                        <div className="loader-container">
-                                            <div className="spinner" />
-                                        </div>
-                                        {/* <Skeleton count={ListProduk.length} /> */}
-                                    </td>
-                                </Tr>
-                                :
-                                ListProduk.length > 0 ? ListProduk.map((item,index)=>{
-                                return <Tr style={{
-                                    marginBottom:20,
-                                    backgroundColor:item.Status === "0" ? '#EEEEEE' : 'white',
-                                    borderTopWidth:1,
-                                    borderTop:'2px solid #546E7A',
-                                    borderBottom:item.Id === IdIndex && isHoveringNoEdit ? "2px solid #546E7A" : "white",
-                                    borderTopColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
-                                    borderLeftColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
-                                    borderLeftWidth:1,
-                                    borderLeft:item.Id === IdIndex && isHoveringNoEdit ? '2px solid #546E7A' : '2px solid white',
-                                    borderRightColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
-                                    borderRightWidth:1,
-                                    borderRight:item.Id === IdIndex && isHoveringNoEdit ? '2px solid #546E7A' : '2px solid white',
-                                    textAlign:'left'
-                                }} onMouseOver={() => handleMouseOver(item.Id, item, "no-edit")} onMouseOut={handleMouseOut}>
-                                        {LoadingStatus && item.ProdukId === IdStatus ?
-                                        <div className="loader-container-small">
-                                            <div className="spinner-small" />
-                                        </div>
-                                        :
-                                        <td style={{ paddingTop:20, paddingBottom:20, color:'#546E7A', borderTopLeftRadius:10, borderBottomLeftRadius:10 }} onMouseOut={handleMouseOut}>
-                                            <Form>
-                                                <Form.Check
-                                                    disabled={item.UsernameLogin !== "admin_gudang" ? false : true}
-                                                    type="switch"
-                                                    id={item.Id}
-                                                    checked={item.Status === "0" ? false : true}
-                                                    onChange={() => {
-                                                        setIdStatus(item.ProdukId)
-                                                        handleChangeStatus(item.ProdukId, item.Status)
-                                                    }}
-                                                />
-                                            </Form>
-                                        </td>
-                                        }
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.ProdukId}</td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.NamaProduk}</td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.KategoriNamaProduk === "" ? "-" : item.KategoriNamaProduk}</td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.UserInput}</td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalUpdate}</td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalInput}</td>
-                                        <td>
-                                            <FaPenSquare 
-                                                style={{ height:20, width:20, cursor:'pointer' }} 
-                                                onClick={() => {
-                                                    setIdProdukModalUpdate(item.ProdukId)
-                                                    setNamaProdukModalUpdate(item.NamaProduk)
-                                                    setKategoriProdukModalUpdate(item.KategoriNamaProduk)
-                                                    setModalUpdate(true)
-                                                }}
-                                            />
-                                        </td>
-                                        <td>
-                                            <FaTrash 
-                                                style={{ height:20, width:20, cursor:'pointer' }}
-                                                onClick={() => {
-                                                    setIdProdukDelete(item.ProdukId)
-                                                    setShowAlert(true)
-                                                    setConfirmMessage("Apakah anda yakin ingin menghapus " + item.NamaProduk + " ?")
-                                                }}
-                                            />
-                                        </td>
-                                    </Tr>;
-                                }) : <Tr><td colSpan="9" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
-                                }
-                            </Tbody>
-                        </Table>
-
-                        <hr/>
-
-                        <Modal
-                            show={ModalUpdate}
-                            size="lg"
-                            aria-labelledby="contained-modal-title-vcenter"
-                            centered
-                            style={{ borderRadius:10}}
-                            >
-                            <Modal.Body>
-                                <Gap height={20} />
-
-                                <h3>Update Detail Master Product</h3>
-
-                                <hr />
-
-                                <div>
-                                    <div style={{ fontSize:16, fontWeight:'bold', marginBottom:10, color:'#61308C' }}>Nama Produk</div>
-                                    <div>
-                                        <Input
-                                            required
-                                            value={NamaProdukModalUpdate}
-                                            onChange={event => setNamaProdukModalUpdate(event.target.value)}
-                                        />
+                                        <FontAwesomeIcon icon={faArrowsRotate} style={{ height:15, width:25 }} />
                                     </div>
                                 </div>
+                                <div style={{  display:'flex', alignItems:'center'  }}>
+                                    <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => {
+                                        setPageScan(true)
+                                        setPageImport(false)
+                                    }}>
+                                        <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faBarcode} /> Scan Product</div>
+                                    </div>
+                                    <div style={{  marginLeft:10  }} />
+                                    <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => {
+                                        setPageScan(false)
+                                        setPageImport(true)
+                                    }}>
+                                        <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faFileImport} /> Import Product</div>
+                                    </div>
+                                </div>
+                                
+                            </div>
+                        
+                            <hr/>
 
-                                <Gap height={20} />
-
-                                <div>
-                                    <div style={{ fontSize:16, fontWeight:'bold', marginBottom:10, color:'#61308C' }}>Kategori Produk</div>
-                                    <div>
-                                        <Dropdown onChange={event => setKategoriProdukModalUpdate(event.target.value)}>
+                            <Table striped bordered hover responsive cellspacing="0" cellpadding="10" style={{ fontSize:13, borderColor:'white', width:'100%' }}>
+                                <Thead>
+                                    <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
+                                        <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}>
+                                            <Dropdown onChange={(event) => getListProduk(1, "", event.target.value, "status") }>
+                                                <option value="">Filter Status</option>
+                                                <option value="1" selected={Status === "1"}>Aktif</option>
+                                                <option value="0" selected={Status === "0"}>Tidak Aktif</option>
+                                            </Dropdown>
+                                        </Th>
+                                        <Th className="tabelHeader">
+                                            <Input
+                                                required
+                                                value={ProdukId}
+                                                onChange={event => setProdukId(event.target.value)}
+                                                onKeyDown={event => {
+                                                    if (event.key === 'Enter') {
+                                                        getListProduk(1, "", event.target.value, "produk_id")
+                                                        event.target.blur()
+                                                    }
+                                                }}
+                                            />
+                                        </Th>
+                                        <Th className="tabelHeader">
+                                            <Input
+                                                required
+                                                value={NamaProduk}
+                                                onChange={event => setNamaProduk(event.target.value)}
+                                                onKeyDown={event => {
+                                                    if (event.key === 'Enter') {
+                                                        getListProduk(1, "", event.target.value, "nama_produk")
+                                                        event.target.blur()
+                                                    }
+                                                }}
+                                                onFocus={() => setNamaProduk("")}
+                                            />
+                                        </Th>
+                                        <Th className="tabelHeader">
+                                            <Dropdown onChange={event => {
+                                                getListProduk(1, "", event.target.value, "kategori_produk")
+                                                setKategoriProduk(event.target.value)
+                                            }}>
                                             <option value="">Pilih Kategori</option>
                                             {ListKategoriProduk.length > 0 && ListKategoriProduk.map((item,index) => {
-                                                return <option value={item.Id} selected={item.NamaKategori === KategoriProdukModalUpdate}>{item.NamaKategori}</option>
+                                                return <option value={item.Id}>{item.NamaKategori}</option>
                                             })}
-                                        </Dropdown>
+                                            </Dropdown>
+                                        </Th>
+                                        <Th className="tabelHeader">
+                                            <Input
+                                                required
+                                                value={UserInput}
+                                                onChange={event => setUserInput(event.target.value)}
+                                                onKeyDown={event => {
+                                                    if (event.key === 'Enter') {
+                                                        getListProduk(1, "", event.target.value, "user_input")
+                                                        event.target.blur()
+                                                    }
+                                                }}
+                                            />
+                                        </Th>
+                                        <Th className="tabelHeader"></Th>
+                                        <Th className="tabelHeader"></Th>
+                                        <Th className="tabelHeader"></Th>
+                                    </Tr>
+                                </Thead>
+                                <Thead>
+                                    <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
+                                        <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH>Status</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>Produk Id</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>Nama Produk</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>Kategori Produk</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>User Input</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>Tanggal Update</LabelTH></Th>
+                                        <Th className="tabelHeader"><LabelTH>Tanggal Input</LabelTH></Th>
+                                        <Th className="tabelHeader" colSpan={2}><LabelTH>Action</LabelTH></Th>
+                                    </Tr>
+                                </Thead>
+                                <Tbody>
+                                    {Loading ? 
+                                    <Tr>
+                                        <td colSpan="9" align="center">
+                                            <div className="loader-container">
+                                                <div className="spinner" />
+                                            </div>
+                                            {/* <Skeleton count={ListProduk.length} /> */}
+                                        </td>
+                                    </Tr>
+                                    :
+                                    ListProduk.length > 0 ? ListProduk.map((item,index)=>{
+                                    return <Tr style={{
+                                        marginBottom:20,
+                                        backgroundColor:item.Status === "0" ? '#EEEEEE' : 'white',
+                                        borderTopWidth:1,
+                                        borderTop:'2px solid #546E7A',
+                                        borderBottom:item.Id === IdIndex && isHoveringNoEdit ? "2px solid #546E7A" : "white",
+                                        borderTopColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
+                                        borderLeftColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
+                                        borderLeftWidth:1,
+                                        borderLeft:item.Id === IdIndex && isHoveringNoEdit ? '2px solid #546E7A' : '2px solid white',
+                                        borderRightColor:item.Id === IdIndex && isHoveringNoEdit ? "#546E7A" : "white",
+                                        borderRightWidth:1,
+                                        borderRight:item.Id === IdIndex && isHoveringNoEdit ? '2px solid #546E7A' : '2px solid white',
+                                        textAlign:'left'
+                                    }} onMouseOver={() => handleMouseOver(item.Id, item, "no-edit")} onMouseOut={handleMouseOut}>
+                                            {LoadingStatus && item.ProdukId === IdStatus ?
+                                            <div className="loader-container-small">
+                                                <div className="spinner-small" />
+                                            </div>
+                                            :
+                                            <td style={{ paddingTop:20, paddingBottom:20, color:'#546E7A', borderTopLeftRadius:10, borderBottomLeftRadius:10 }} onMouseOut={handleMouseOut}>
+                                                <Form>
+                                                    <Form.Check
+                                                        disabled={item.UsernameLogin !== "admin_gudang" ? false : true}
+                                                        type="switch"
+                                                        id={item.Id}
+                                                        checked={item.Status === "0" ? false : true}
+                                                        onChange={() => {
+                                                            setIdStatus(item.ProdukId)
+                                                            handleChangeStatus(item.ProdukId, item.Status)
+                                                        }}
+                                                    />
+                                                </Form>
+                                            </td>
+                                            }
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.ProdukId}</td>
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.NamaProduk}</td>
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.KategoriNamaProduk === "" ? "-" : item.KategoriNamaProduk}</td>
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.UserInput}</td>
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalUpdate}</td>
+                                            <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalInput}</td>
+                                            <td>
+                                                <FaPenSquare 
+                                                    style={{ height:20, width:20, cursor:'pointer' }} 
+                                                    onClick={() => {
+                                                        setIdProdukModalUpdate(item.ProdukId)
+                                                        setNamaProdukModalUpdate(item.NamaProduk)
+                                                        setKategoriProdukModalUpdate(item.KategoriNamaProduk)
+                                                        setModalUpdate(true)
+                                                    }}
+                                                />
+                                            </td>
+                                            <td>
+                                                <FaTrash 
+                                                    style={{ height:20, width:20, cursor:'pointer' }}
+                                                    onClick={() => {
+                                                        setIdProdukDelete(item.ProdukId)
+                                                        setShowAlert(true)
+                                                        setConfirmMessage("Apakah anda yakin ingin menghapus " + item.NamaProduk + " ?")
+                                                    }}
+                                                />
+                                            </td>
+                                        </Tr>;
+                                    }) : <Tr><td colSpan="9" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
+                                    }
+                                </Tbody>
+                            </Table>
+
+                            <hr/>
+
+                            <Modal
+                                show={ModalUpdate}
+                                size="lg"
+                                aria-labelledby="contained-modal-title-vcenter"
+                                centered
+                                style={{ borderRadius:10}}
+                                >
+                                <Modal.Body>
+                                    <Gap height={20} />
+
+                                    <h3>Update Detail Master Product</h3>
+
+                                    <hr />
+
+                                    <div>
+                                        <div style={{ fontSize:16, fontWeight:'bold', marginBottom:10, color:'#61308C' }}>Nama Produk</div>
+                                        <div>
+                                            <Input
+                                                required
+                                                value={NamaProdukModalUpdate}
+                                                onChange={event => setNamaProdukModalUpdate(event.target.value)}
+                                            />
+                                        </div>
+                                    </div>
+
+                                    <Gap height={20} />
+
+                                    <div>
+                                        <div style={{ fontSize:16, fontWeight:'bold', marginBottom:10, color:'#61308C' }}>Kategori Produk</div>
+                                        <div>
+                                            <Dropdown onChange={event => setKategoriProdukModalUpdate(event.target.value)}>
+                                                <option value="">Pilih Kategori</option>
+                                                {ListKategoriProduk.length > 0 && ListKategoriProduk.map((item,index) => {
+                                                    return <option value={item.Id} selected={item.NamaKategori === KategoriProdukModalUpdate}>{item.NamaKategori}</option>
+                                                })}
+                                            </Dropdown>
+                                        </div>
+                                    </div>
+
+                                </Modal.Body>
+
+                                <Gap height={20} />
+                                
+                                <div style={{ display:'flex', justifyContent:'flex-end', padding:15, alignItems:'center' }}>
+                                    <div style={{ color:'#B4C1C8', marginRight:20, fontSize:20, cursor:'pointer' }} onClick={() => setModalUpdate(false)}>Cancel</div>
+                                    <div style={{ backgroundColor:'#3A379F', borderTopLeftRadius:8, borderTopRightRadius:8, borderBottomLeftRadius:8, borderBottomRightRadius:8, padding:10, width:150 }}>
+                                        <div style={{ color:'#FFFFFF', textAlign:'center', fontWeight:'bold', cursor:'pointer' }} 
+                                        onClick={() => updateDetailProduk()}
+                                        >Save Changes</div>
                                     </div>
                                 </div>
+                            </Modal>
 
-                            </Modal.Body>
-
-                            <Gap height={20} />
-                            
-                            <div style={{ display:'flex', justifyContent:'flex-end', padding:15, alignItems:'center' }}>
-                                <div style={{ color:'#B4C1C8', marginRight:20, fontSize:20, cursor:'pointer' }} onClick={() => setModalUpdate(false)}>Cancel</div>
-                                <div style={{ backgroundColor:'#3A379F', borderTopLeftRadius:8, borderTopRightRadius:8, borderBottomLeftRadius:8, borderBottomRightRadius:8, padding:10, width:150 }}>
-                                    <div style={{ color:'#FFFFFF', textAlign:'center', fontWeight:'bold', cursor:'pointer' }} 
-                                    onClick={() => updateDetailProduk()}
-                                    >Save Changes</div>
-                                </div>
+                            <div 
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    alignItems:'center',
+                                }}
+                            >
+                                Total Data: {TotalData}
                             </div>
-                        </Modal>
 
-                        <div 
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                alignItems:'center',
-                            }}
-                        >
-                            Total Data: {TotalData}
-                        </div>
-
-                        <div
-                            style={{
-                                display: 'flex',
-                                flexDirection: 'column',
-                                justifyContent: 'center',
-                                padding: 20,
-                                boxSizing: 'border-box',
-                                alignItems:'center',
-                            }}
-                        >
-                        <ReactPaginate
-                            pageCount={TotalPages}
-                            onPageChange={handlePageClick}
-                            forcePage={Paging}
-                            containerClassName={'pagination'}
-                            pageClassName={'page-item'}
-                            pageLinkClassName={'page-link'}
-                            previousClassName={'page-item'}
-                            previousLinkClassName={'page-link'}
-                            nextClassName={'page-item'}
-                            nextLinkClassName={'page-link'}
-                            breakClassName={'page-item'}
-                            breakLinkClassName={'page-link'}
-                            activeClassName={'active'}
-                        />
-                        </div>
-                        
+                            <div
+                                style={{
+                                    display: 'flex',
+                                    flexDirection: 'column',
+                                    justifyContent: 'center',
+                                    padding: 20,
+                                    boxSizing: 'border-box',
+                                    alignItems:'center',
+                                }}
+                            >
+                            <ReactPaginate
+                                pageCount={TotalPages}
+                                onPageChange={handlePageClick}
+                                forcePage={Paging}
+                                containerClassName={'pagination'}
+                                pageClassName={'page-item'}
+                                pageLinkClassName={'page-link'}
+                                previousClassName={'page-item'}
+                                previousLinkClassName={'page-link'}
+                                nextClassName={'page-item'}
+                                nextLinkClassName={'page-link'}
+                                breakClassName={'page-item'}
+                                breakLinkClassName={'page-link'}
+                                activeClassName={'active'}
+                            />
+                            </div>
+                        </>
+                        }
                     </div>
                 </div>
             </div>
