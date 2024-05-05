@@ -91,11 +91,11 @@ const fetchStatus2 = (response) => {
 
 function FormatNumberBy3(num, decpoint, sep) {
   num = Math.round(num);
-  if(num !== null && num !== ""){
-    if (arguments.length === 2) {
+  if(num!=null && num != ""){
+    if (arguments.length == 2) {
       sep = ".";
     }
-    if (arguments.length === 1) {
+    if (arguments.length == 1) {
       sep = ".";
       decpoint = ",";
     }

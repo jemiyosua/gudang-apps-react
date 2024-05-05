@@ -5,12 +5,14 @@ import { BrowserRouter , Route, Switch, useHistory, useRouteMatch } from 'react-
 import LeftMenu from '../../components/molecules/LeftMenu'
 import { historyConfig } from '../../utils/functions'
 import Dashboard from '../Dashboard'
-import Gudang from '../Gudang'
-import Kasir from '../Kasir'
-import Keuangan from '../Keuangan'
-import Other from '../Other'
-import ImportProduct from '../Gudang/MasterProduct/ImportProduct'
-import ScanProduct from '../Gudang/MasterProduct/ScanProduct'
+import MasterData from '../MasterData'
+import User from '../User'
+import InputAdminAccess from '../User/AdminAccess/InputAdminAccess'
+import UpdateAdminAccess from '../User/AdminAccess/UpdateAdminAccess'
+import InputRoleAccess from '../User/RoleAccess/InputRoleAccess'
+import UpdateRoleAccess from '../User/RoleAccess/UpdateRoleAccess'
+import Student from '../MasterData/Main/DaftarSiswa'
+import Main from '../MasterData/Main'
 
 const MainApp = () => {
     const history = useHistory(historyConfig);
@@ -27,7 +29,7 @@ const MainApp = () => {
 
     useEffect(()=>{
         // alert("mainapp")
-        document.title = "Sistem Informasi Gudang dan Perhitungan";
+        document.title = "Sistem Informasi Akademik Methodist 1";
         // if(cookies.CookieParamKey==null || cookies.CookieParamKey=="" ||
         // cookies.ckUI==null || cookies.ckUI==""){
         //     alert("Session anda telah habis. Silahkan login kembali.");
@@ -50,23 +52,29 @@ const MainApp = () => {
                             <Route exact path="/dashboard">
                                 <Dashboard />
                             </Route>
-                            <Route exact path="/gudang">
-                                <Gudang />
+                            <Route exact path="/master-data">
+                                <MasterData />
                             </Route>
-                            <Route exact path="/kasir">
-                                <Kasir />
+                            <Route exact path="/main">
+                                <Main />
                             </Route>
-                            <Route exact path="/keuangan">
-                                <Keuangan />
+                            <Route exact path="/student">
+                                <Student />
                             </Route>
-                            <Route exact path="/other">
-                                <Other />
+                            <Route exact path="/user">
+                                <User />
                             </Route>
-                            <Route exact path="/gudang/import-product">
-                                <ImportProduct />
+                            <Route exact path="/input-admin-access">
+                                <InputAdminAccess />
                             </Route>
-                            <Route exact path="/gudang/scan-product">
-                                <ScanProduct />
+                            <Route exact path="/update-admin-access">
+                                <UpdateAdminAccess />
+                            </Route>
+                            <Route exact path="/input-role-access">
+                                <InputRoleAccess />
+                            </Route>
+                            <Route exact path="/update-role-access">
+                                <UpdateRoleAccess />
                             </Route>
                         </Switch>
                     </BrowserRouter>

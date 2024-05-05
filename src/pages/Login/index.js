@@ -15,6 +15,7 @@ import md5 from 'md5';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { Markup } from 'interweave';
 import { setForm } from '../../redux';
+import { LogoMethodist } from '../../assets';
 
 const Login = () => {
     const history = useHistory(historyConfig);
@@ -52,6 +53,7 @@ const Login = () => {
         removeCookie('varIdVoucher', { path: '/'})
         dispatch(setForm("ParamKey",''))
         dispatch(setForm("Username",''))
+        dispatch(setForm("Name",''))
         dispatch(setForm("Role",''))
         if (window) {
             sessionStorage.clear();
@@ -60,18 +62,20 @@ const Login = () => {
 
     const getCookie = (tipe) => {
         var SecretCookie = cookies.varCookie;
-        console.log("SecretCookie : " + SecretCookie)
         if (SecretCookie !== "" && SecretCookie != null && typeof SecretCookie == "string") {
             var LongSecretCookie = SecretCookie.split("|");
-            var Username = LongSecretCookie[0];
+            var UserName = LongSecretCookie[0];
             var ParamKeyArray = LongSecretCookie[1];
-            var Role = LongSecretCookie[2];
+            var Nama = LongSecretCookie[2];
+            var Role = LongSecretCookie[3];
             var ParamKey = ParamKeyArray.substring(0, ParamKeyArray.length)
         
             if (tipe === "username") {
-                return Username;      
+                return UserName;            
             } else if (tipe === "paramkey") {
                 return ParamKey;
+            } else if (tipe === "nama") {
+                return Nama;
             } else if (tipe === "role") {
                 return Role;
             } else {
@@ -85,15 +89,15 @@ const Login = () => {
     const SubmitLogin = () => {
 
         let validasiMessage = "";
-        if (Username == "") {
-            validasiMessage = validasiMessage + "- Username can't null value.\n";
+        if (Username === "") {
+            validasiMessage = validasiMessage + "- Silahkan isi Username terlebih dahulu.\n";
         }
 
-        if (Password == "") {
-            validasiMessage = validasiMessage + "- Password can't null value.\n";
+        if (Password === "") {
+            validasiMessage = validasiMessage + "- Silahkan isi Password terlebih dahulu.\n";
         }
 
-        if (validasiMessage != "") {
+        if (validasiMessage !== "") {
             setValidationMessage(validasiMessage);
             setShowAlert(true);
             return false;
@@ -103,6 +107,8 @@ const Login = () => {
                 "Username": Username,
                 "Password": md5(Password)
             });
+
+            console.log("LOGIN REQUEST : " + requestBody)
 
             var url = paths.URL_API_ADMIN + 'Login';
             var Signature  = generateSignature(requestBody)
@@ -122,19 +128,22 @@ const Login = () => {
             .then((data) => {
                 setLoading(false)
 
-                if (data.ErrorCode === "0") {
+                console.log("LOGIN RESPONSE : " + JSON.stringify(data))
+
+                if (data.ErrCode === "0") {
                     const date = new Date();
                     date.setDate(date.getDate() + 1);            
                     
-                    setCookie('varCookie', data.Username + "|" + data.ParamKey + "|" + data.Role, { path: '/', expires: new Date(date) })
+                    setCookie('varCookie', data.UserName + "|" + data.ParamKey + "|" + data.Name + "|" + data.Role, { path: '/', expires: new Date(date) })
                     dispatch(setForm("ParamKey", data.ParamKey))
-                    dispatch(setForm("Username", data.Username))
+                    dispatch(setForm("UserName", data.UserName))
+                    dispatch(setForm("Name", data.Name))
                     dispatch(setForm("Role", data.Role))
 
                     window.location.href="/admin/dashboard"
 
                 } else {
-                    setErrorMessageAlert(data.ErrorMessage);
+                    setErrorMessageAlert(data.ErrMessage);
                     setShowAlert(true);
                     return false;
                 }
@@ -195,7 +204,7 @@ const Login = () => {
 
                 <Gap height={30} />
 
-                <p className="title" style={{ textAlign:'center' }}>Gudang Apps</p>
+                <p className="title" style={{ textAlign:'center' }}>Methodist 1</p>
 
                 <Input 
                     label="Username" 
@@ -216,9 +225,7 @@ const Login = () => {
                 
                 <Gap height={18} />
 
-                <Input 
-                    label="Password" 
-                    placeholder="Password"
+                <Input label="Password" placeholder="Password"
                     value={Password}
                     type="password"
                     style={{backgroundColor: "#F6FBFF"}}

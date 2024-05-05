@@ -1,24 +1,23 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { useCookies } from 'react-cookie';
 import { useHistory } from 'react-router-dom';
-import { Header, Footer, Input, Button, Gap, Dropdown } from '../../../components';
-import './Tab.css'
+import { Header, Footer, Input, Button, Gap, Dropdown } from '../../../../components';
+import './Student.css'
+import '../Tab.css'
 import { useDispatch } from 'react-redux';
-import { AlertMessage, paths } from '../../../utils'
-import { historyConfig, generateSignature, fetchStatus } from '../../../utils/functions';
-import { setForm } from '../../../redux';
+import { AlertMessage, paths } from '../../../../utils'
+import { historyConfig, generateSignature, fetchStatus } from '../../../../utils/functions';
+import { setForm } from '../../../../redux';
 import SweetAlert from 'react-bootstrap-sweetalert';
 import { Table, Thead, Tbody, Tr, Th, Td } from 'react-super-responsive-table';
-import LabelTH from '../../../components/molecules/LabelTH'
+import LabelTH from '../../../../components/molecules/LabelTH'
 import { Col, Row, Form, ListGroup, Modal } from 'react-bootstrap';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faFilter, faUserPlus, faArrowLeft, faArrowLeftRotate, faArrowsRotate, faEllipsisVertical, faUserPen, faPercent, faGraduationCap, faLayerGroup, faFileExcel, faFileImport, faBarcode, faAdd } from '@fortawesome/free-solid-svg-icons';
+import { faFilter, faUserPlus, faArrowLeft, faArrowLeftRotate, faArrowsRotate, faEllipsisVertical, faUserPen, faPercent, faGraduationCap } from '@fortawesome/free-solid-svg-icons';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import ReactPaginate from 'react-paginate';
-import Skeleton, { SkeletonTheme } from 'react-loading-skeleton'
-import 'react-loading-skeleton/dist/skeleton.css'
 
-const Category = () => {
+const AdminAccess = () => {
     const history = useHistory(historyConfig);
     const dispatch = useDispatch();
     const containerRef = useRef(null);
@@ -31,17 +30,8 @@ const Category = () => {
     const [isHovering, setIsHovering] = useState(false)
     const [isHoveringNoEdit, setIsHoveringNoEdit] = useState(false)
 
-	const [ListKategori, setListKategori] = useState([])
+	const [ListSiswa, setListSiswa] = useState([])
     const [IdStatus, setIdStatus] = useState("")
-    const [KategoriId, setKategoriId] = useState("")
-    const [KategoriNama, setKategoriNama] = useState("")
-    const [KategoriNamaEdit, setKategoriNamaEdit] = useState("")
-    const [Status, setStatus] = useState("")
-    const [StatusEditNamaKategori, setStatusEditNamaKategori] = useState("")
-
-    const [ModalAddNew, setModalAddNew] = useState(false)
-    const [NamaKategoriModal, setNamaKategoriModal] = useState("")
-
     const [Filter, setFilter] = useState("")
     const [FilterPopup, setFilterPopup] = useState(false)
     const [Search, setSearch] = useState("")
@@ -49,6 +39,7 @@ const Category = () => {
     const [TotalData, setTotalData] = useState(0)
     const [TotalPages, setTotalPages] = useState(0)
     const [Paging, setPaging] = useState("")
+    const [RoleAccess, setRoleAccess] = useState("")
 	
 	const [ShowAlert, setShowAlert] = useState(true)
     const [SessionMessage, setSessionMessage] = useState("")
@@ -77,10 +68,10 @@ const Category = () => {
         } else {
             dispatch(setForm("ParamKey",CookieParamKey))
             dispatch(setForm("Username",CookieUsername))
-            dispatch(setForm("PageActive","Category"))
+            dispatch(setForm("PageActive","Master Data"))
 
-            // setRoleAccess(CookieRole)
-            getListcategory(1, "", "", "")
+            setRoleAccess(CookieRole)
+            getListSiswa(1, "")
         }
 
     },[])
@@ -132,22 +123,27 @@ const Category = () => {
         // setEditablePrice(false)
     };
 
-    const getListcategory = (Page, Position, SearchValue, SearchType) => {
+    const getListSiswa = (Page, Position) => {
 
-        var SearchKategoriNama = ""
+        var SearchNama = ""
         var Status = ""
 
         if (Position === "reset-filter") {
-            // setFilter("")
-            // setSearch("")
-            // setFilterStatus("")
+            setFilter("")
+            setSearch("")
+            setFilterStatus("")
         } else {
-            if (SearchType !== "") {
-                if (SearchType === "nama_kategori") {
-                    SearchKategoriNama = SearchValue
-                } else if (SearchType === "status") {
-                    setStatus(SearchValue)
-                    Status = SearchValue
+            if (Filter !== "") {
+                if (Filter === "name") {
+                    SearchNama = Search
+                }
+            }
+
+            if (FilterStatus !== "") {
+                if (FilterStatus === "tidak-aktif") {
+                    Status = "0"
+                } else  {
+                    Status = "1"
                 }
             }
         }
@@ -159,15 +155,14 @@ const Category = () => {
             "UserName": CookieUsername,
             "ParamKey": CookieParamKey,
             "Method": "SELECT",
-            "NamaKategori": SearchKategoriNama,
-            "StatusKategori": Status,
+            "Grade": "10",
             "Page": Page,
             "RowPage": 20,
-            "OrderBy": "dbmp.tgl_input",
+            "OrderBy": "tgl_input",
             "Order": "DESC"
         });
 
-		var url = paths.URL_API_ADMIN + 'Category';
+		var url = paths.URL_API_ADMIN + 'Siswa';
 		var Signature  = generateSignature(requestBody)
 
 		setLoading(true)
@@ -185,17 +180,17 @@ const Category = () => {
 		.then((data) => {
 			setLoading(false)
 
-			if (data.ErrorCode === "0") {
-				setListKategori(data.Result)
+			if (data.ErrCode === "0") {
+				setListSiswa(data.Result)
                 setTotalData(data.TotalData)
                 setTotalPages(data.TotalPage)
 			} else {
-				if (data.ErrorCode === "2") {
+				if (data.ErrCode === "2") {
 					setSessionMessage("Session Anda Telah Habis. Silahkan Login Kembali.");
                     setShowAlert(true);
 					return false;
 				} else {
-					setErrorMessageAlert(data.ErrorMessage);
+					setErrorMessageAlert(data.ErrMessage);
 					setShowAlert(true);
 					return false;
 				}
@@ -215,7 +210,7 @@ const Category = () => {
 		});
     }
 
-    const updateStatusKategori = (IdKategori, Status) => {
+    const updateStatusUser = (IdUserlogin, Status) => {
 
         var vStatus = ""
         if (Status === "0") {
@@ -224,8 +219,8 @@ const Category = () => {
             vStatus = "0"
         }
 
-        if (IdKategori === 0) {
-            setErrorMessageAlert("Id Kategori tidak boleh kosong");
+        if (IdUserlogin === 0) {
+            setErrorMessageAlert("IdUserlogin tidak boleh kosong");
             setShowAlert(true);
             return false;
         }
@@ -234,14 +229,14 @@ const Category = () => {
         var CookieUsername = getCookie("username");
 
 		var requestBody = JSON.stringify({
-			"Username": CookieUsername,
+			"UsernameSession": CookieUsername,
 			"ParamKey": CookieParamKey,
 			"Method": "UPDATE",
-            "Id": IdKategori,
+            "Id": IdUserlogin,
             "Status": vStatus
 		});
 
-		var url = paths.URL_API_ADMIN + 'Category';
+		var url = paths.URL_API_ADMIN + 'UserLogin';
 		var Signature  = generateSignature(requestBody)
 
 		setLoadingStatus(true)
@@ -259,147 +254,15 @@ const Category = () => {
 		.then((data) => {
 			setLoadingStatus(false)
 
-			if (data.ErrorCode === "0") {
-				// getListItem(1, "")
+			if (data.ErrCode === "0") {
+				// getListSiswa(1, "")
 			} else {
-				if (data.ErrorCode === "2") {
+				if (data.ErrCode === "2") {
 					setSessionMessage("Session Anda Telah Habis. Silahkan Login Kembali.");
                     setShowAlert(true);
 					return false;
 				} else {
-					setErrorMessageAlert(data.ErrorMessage);
-					setShowAlert(true);
-					return false;
-				}
-			}
-		})
-		.catch((error) => {
-			setLoadingStatus(false)
-			if (error.message === 401) {
-				setErrorMessageAlert("Maaf anda tidak memiliki ijin untuk mengakses halaman ini.");
-				setShowAlert(true);
-				return false;
-			} else if (error.message !== 401) {
-				setErrorMessageAlert(AlertMessage.failedConnect);
-				setShowAlert(true);
-				return false;
-			}
-		});
-    }
-
-    const inputKategori = () => {
-
-        if (NamaKategoriModal === "") {
-            setErrorMessageAlert("Nama Kategori tidak boleh kosong");
-            setShowAlert(true);
-            return false;
-        }
-
-		var CookieParamKey = getCookie("paramkey");
-        var CookieUsername = getCookie("username");
-
-		var requestBody = JSON.stringify({
-			"Username": CookieUsername,
-			"ParamKey": CookieParamKey,
-			"Method": "INSERT",
-            "NamaKategori": NamaKategoriModal
-		});
-
-		var url = paths.URL_API_ADMIN + 'Category';
-		var Signature  = generateSignature(requestBody)
-
-		setLoadingStatus(true)
-
-		fetch(url, {
-			method: "POST",
-			body: requestBody,
-			headers: {
-				'Content-Type': 'application/json',
-				'Signature': Signature
-			},
-		})
-		.then(fetchStatus)
-		.then(response => response.json())
-		.then((data) => {
-			setLoadingStatus(false)
-
-			if (data.ErrorCode === "0") {
-				getListcategory(1, "")
-                setSuccessMessage("Berhasil input data")
-                setShowAlert(true)
-                setModalAddNew(false)
-			} else {
-				if (data.ErrorCode === "2") {
-					setSessionMessage("Session Anda Telah Habis. Silahkan Login Kembali.");
-                    setShowAlert(true);
-					return false;
-				} else {
-					setErrorMessageAlert(data.ErrorMessage);
-					setShowAlert(true);
-					return false;
-				}
-			}
-		})
-		.catch((error) => {
-			setLoadingStatus(false)
-			if (error.message === 401) {
-				setErrorMessageAlert("Maaf anda tidak memiliki ijin untuk mengakses halaman ini.");
-				setShowAlert(true);
-				return false;
-			} else if (error.message !== 401) {
-				setErrorMessageAlert(AlertMessage.failedConnect);
-				setShowAlert(true);
-				return false;
-			}
-		});
-    }
-
-    const updateNamaKategori = (IdKategori, NamaKategori) => {
-
-        if (NamaKategori === "") {
-            setErrorMessageAlert("Nama Kategori tidak boleh kosong");
-            setShowAlert(true);
-            return false;
-        }
-
-		var CookieParamKey = getCookie("paramkey");
-        var CookieUsername = getCookie("username");
-
-		var requestBody = JSON.stringify({
-			"Username": CookieUsername,
-			"ParamKey": CookieParamKey,
-			"Method": "UPDATE",
-            "Id": IdKategori,
-            "NamaKategori": NamaKategori
-		});
-
-		var url = paths.URL_API_ADMIN + 'Category';
-		var Signature  = generateSignature(requestBody)
-
-		setLoadingStatus(true)
-
-		fetch(url, {
-			method: "POST",
-			body: requestBody,
-			headers: {
-				'Content-Type': 'application/json',
-				'Signature': Signature
-			},
-		})
-		.then(fetchStatus)
-		.then(response => response.json())
-		.then((data) => {
-			setLoadingStatus(false)
-
-			if (data.ErrorCode === "0") {
-				// getListItem(1, "")
-			} else {
-				if (data.ErrorCode === "2") {
-					setSessionMessage("Session Anda Telah Habis. Silahkan Login Kembali.");
-                    setShowAlert(true);
-					return false;
-				} else {
-					setErrorMessageAlert(data.ErrorMessage);
+					setErrorMessageAlert(data.ErrMessage);
 					setShowAlert(true);
 					return false;
 				}
@@ -420,7 +283,7 @@ const Category = () => {
     }
 
     const handleChangeStatus = (Id, Status) => {
-        var vListKategori = ListKategori
+        var vListUsesr = ListSiswa
 
         var vStatus = ""
         if (Status === "0") {
@@ -429,25 +292,13 @@ const Category = () => {
             vStatus = "0"
         }
 
-        vListKategori.map((item,index) => {
+        vListUsesr.map((item,index) => {
             if (item.Id === Id) {
-                vListKategori[index].Status = vStatus
-                updateStatusKategori(Id, Status)
+                vListUsesr[index].Status = vStatus
+                updateStatusUser(Id, Status)
             }
         })
-        setListKategori(vListKategori)
-    }
-
-    const handleUpdateNamaKategori = (Id, NamaKategori) => {
-        var vListKategori = ListKategori
-
-        vListKategori.map((item,index) => {
-            if (item.Id === Id) {
-                vListKategori[index].NamaKategori = NamaKategori
-                updateNamaKategori(Id, NamaKategori)
-            }
-        })
-        setListKategori(vListKategori)
+        getListSiswa(vListUsesr)
     }
 
 	const logout = ()=>{
@@ -464,17 +315,18 @@ const Category = () => {
     }
 
     const handlePageClick = (data) => {
+
         let currentPage = data.selected + 1
         setPaging(data.selected)
-        setListKategori([])
-        getListcategory(currentPage, "", "", "")
+        setListSiswa([])
+        getListSiswa(currentPage, "")
     }
     
     return (
 		<div className="main-page" style={{ backgroundColor:'#F6FBFF' }}>
             <div className="content-wrapper-2" style={{ backgroundColor:'#F6FBFF', width:'100%' }} >
                 <div className="blog-post">
-                    {/* <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faLayerGroup}/> Master Category</div> */}
+                    <div style={{ fontWeight:'bold', color:'#004372', fontSize:30 }}><FontAwesomeIcon icon={faGraduationCap}/> Daftar Siswa</div>
                     {/* <p style={{ margin:0 }}>Here's for all Admin from SIAM platform.</p> */}
 
                     {SessionMessage !== "" ?
@@ -498,6 +350,7 @@ const Category = () => {
                         onConfirm={() => {
                             setShowAlert(false)
                             setSuccessMessage("")
+                            history.replace("/overview")
                         }}
                         btnSize="sm">
                         {SuccessMessage}
@@ -531,79 +384,119 @@ const Category = () => {
                     </SweetAlert>
                     :""}
                     
-                    {/* <Gap height={20} />
+                    <Gap height={20} />
                     
                     <div>
                         <a href='master-data'>
                             <button role="tab" aria-controls="merchant-list">
-                                <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Master Category</div>
+                                <div style={{ color:'#004372', fontSize:16, fontWeight:'bold' }}>Kelas 10</div>
                             </button>
                         </a>
-                    </div> */}
+                    </div>
                     
                     <div style={{ backgroundColor:'white', height:'auto', width:'100%', borderBottomLeftRadius:25, borderBottomRightRadius:25, borderTopRightRadius:25, padding:20 }}>
 
                         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                            <div 
-                                style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
-                                onClick={() => {
-                                    setStatus("")
-                                    setKategoriId("")
-                                    getListcategory(1, "", "", "")
-                                }}>
-                                <FontAwesomeIcon icon={faArrowsRotate} style={{ height:15, width:25 }} />
+                            <div style={{ display:'flex', justifyContent:'flex-start' }}>
+                                <div style={{ border:'2px solid #004372', padding:5, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => getListSiswa(1, "")}>
+                                    <FontAwesomeIcon icon={faArrowsRotate} style={{ height:10, width:30 }} />
+                                </div>
+                                <div style={{ paddingRight:10 }} />
+                                <div 
+                                    style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} 
+                                    onClick={() => setFilterPopup(!FilterPopup)}>
+                                    <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faFilter} /> Filter Data</div>
+                                </div>
                             </div>
-                            <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => setModalAddNew(true)}>
-                                <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faAdd} /> Add Category</div>
+                            <div style={{ border:'2px solid #004372', padding:10, borderWidth:1, width:'auto', height:'auto', borderTopLeftRadius:15, borderTopRightRadius:15, borderBottomLeftRadius:15, borderBottomRightRadius:15, cursor:'pointer' }} onClick={() => history.push('input-admin-access')}>
+                                <div style={{ fontWeight:'bold', fontSize:13 }}><FontAwesomeIcon icon={faUserPlus} /> Tambah Siswa</div>
                             </div>
                         </div>
+
+                        {FilterPopup &&
+                        <div>
+                            <div style={{ paddingBottom:20 }} />
+                            <div style={{ borderRadius:10, backgroundColor:'#FFFFFF', paddingTop:25, paddingLeft:25, paddingRight:25, position:'absolute', zIndex:100, border:'.5px solid', height:300 }} >
+                                <div style={{ color:'#004372', fontWeight:'bold', fontSize:13 }}>Sort By</div>
+                                <div style={{ marginBottom:10 }}></div>
+                                <Row style={{ alignItems:'center' }}>
+                                    <Col xs={3} md={6} lg={6} style={{ paddingLeft:6 }}>
+                                        <Dropdown
+                                            onChange={(event) => setFilter(event.target.value) }>
+                                            <option value="global">Select Filter</option>
+                                            <option value="name" selected={Filter === "name"}>Name</option>
+                                        </Dropdown>
+                                    </Col>
+                                    <Col xs={3} md={6} lg={6} style={{ paddingLeft:6 }}>
+                                        <Input
+                                            placeHolder="Input Search"
+                                            value={Search}
+                                            style={{ borderColor:'silver' }}
+                                            onChange={event => setSearch(event.target.value)}
+                                        />
+                                    </Col>
+                                </Row>
+
+                                <hr></hr>
+                            
+                                <div style={{ marginBottom:10 }}></div>
+                                <div style={{ color:'#004372', fontWeight:'bold', fontSize:13 }}>Status</div>
+                                <div style={{ marginBottom:10 }}></div>
+
+                                <Row>
+                                    <Col xs={3} md={6} lg={6} style={{ paddingRight:6 }}>
+                                        <Dropdown
+                                            onChange={(event) => setFilterStatus(event.target.value) }>
+                                            <option value="">Select Filter</option>
+                                            <option value="aktif" selected={FilterStatus === "aktif"}>Aktif</option>
+                                            <option value="tidak-aktif" selected={FilterStatus === "tidak-aktif"}>Tidak Aktif</option>
+                                        </Dropdown>
+                                    </Col>
+                                </Row>
+
+                                <div style={{ bottom:10, right:10, position:'absolute', display:'flex', alignItems:'center' }}>
+                                    <div style={{ cursor:'pointer' }} onClick={() => {
+                                        setFilterPopup(false)
+                                        getListSiswa(1, "reset-filter")
+                                        // setPaging(0)
+                                    }}>Reset Filter</div>
+                                    <div style={{ marginLeft:10 }}></div>
+                                    <div style={{ backgroundColor:'#004372', width:100, height:30, borderRadius:10, color:'#FFFFFF', fontSize:13, cursor:'pointer', textAlign:'center' }}>
+                                        <div style={{ marginTop:4, fontWeight:'bold' }} onClick={() => {
+                                            getListSiswa(1, "")
+                                            setFilterPopup(false)
+                                            // setPaging(0)
+                                            }}>Apply Now</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        }
                         
                         <hr/>
 
                         <Table striped bordered hover responsive cellspacing="0" cellpadding="10" style={{ fontSize:13, borderColor:'white', width:'100%' }}>
                             <Thead>
                                 <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
-                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}>
-                                        <Dropdown onChange={(event) => getListcategory(1, "", event.target.value, "status") }>
-                                            <option value="">Filter Status</option>
-                                            <option value="1" selected={Status === "1"}>Aktif</option>
-                                            <option value="0" selected={Status === "0"}>Tidak Aktif</option>
-                                        </Dropdown>
-                                    </Th>
-                                    <Th className="tabelHeader">
-                                        <Input
-                                            required
-                                            value={KategoriNama}
-                                            onChange={event => setKategoriNama(event.target.value)}
-                                            onKeyDown={event => {
-                                                if (event.key === 'Enter') {
-                                                    getListcategory(1, "", event.target.value, "nama_kategori")
-                                                    event.target.blur()
-                                                }
-                                            }}
-                                        />
-                                    </Th>
-                                </Tr>
-                            </Thead>
-                            <Thead>
-                                <Tr style={{color:"#004372", borderColor:'white', textAlign:'left'}}>
-                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH>Status</LabelTH></Th>
-                                    <Th className="tabelHeader"><LabelTH>Nama Kategori</LabelTH></Th>
+                                    <Th className="tabelHeader" style={{ paddingTop:20, paddingBottom:20 }}><LabelTH></LabelTH></Th>
+                                    <Th className="tabelHeader"><LabelTH>Name</LabelTH></Th>
+                                    <Th className="tabelHeader"><LabelTH>Username</LabelTH></Th>
+                                    <Th className="tabelHeader"><LabelTH>Access</LabelTH></Th>
                                     <Th className="tabelHeader"><LabelTH>Tanggal Input</LabelTH></Th>
+                                    <Th className="tabelHeader"><LabelTH>Action</LabelTH></Th>
                                 </Tr>
                             </Thead>
                             <Tbody>
                                 {Loading ? 
                                 <Tr>
-                                    <td colSpan="9" align="center">
+                                    <td colSpan="6" align="center">
                                         <div className="loader-container">
                                             <div className="spinner" />
                                         </div>
-                                        {/* <Skeleton count={ListProduk.length} /> */}
                                     </td>
                                 </Tr>
                                 :
-                                ListKategori.length > 0 ? ListKategori.map((item,index)=>{
+                                ListSiswa.length > 0 ? ListSiswa.map((item,index)=>{
                                 return <Tr style={{
                                     marginBottom:20,
                                     backgroundColor:item.Status === "0" ? '#EEEEEE' : 'white',
@@ -627,87 +520,36 @@ const Category = () => {
                                         <Td style={{ paddingTop:20, paddingBottom:20, color:'#546E7A', borderTopLeftRadius:10, borderBottomLeftRadius:10 }} onMouseOut={handleMouseOut}>
                                             <Form>
                                                 <Form.Check
-                                                    disabled={item.UsernameLogin !== "admin_gudang" ? false : true}
+                                                    disabled={item.Username !== "admin_siam" ? false : true}
                                                     type="switch"
                                                     id={item.Id}
-                                                    checked={item.StatusKategori === "0" ? false : true}
+                                                    checked={item.Status === "0" ? false : true}
                                                     onChange={() => {
                                                         setIdStatus(item.Id)
-                                                        handleChangeStatus(item.Id, item.Status)
+                                                        handleChangeStatus(item.Id, item.Status) 
                                                     }}
                                                 />
                                             </Form>
                                         </Td>
                                         }
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>
-                                            <Input
-                                                required
-                                                value={StatusEditNamaKategori && KategoriId === item.Id ? KategoriNamaEdit : item.NamaKategori}
-                                                onChange={event => setKategoriNamaEdit(event.target.value)}
-                                                onKeyDown={event => {
-                                                    if (event.key === 'Enter') {
-                                                        handleUpdateNamaKategori(item.Id, event.target.value)
-                                                        event.target.blur()
-                                                    }
-                                                }}
-                                                onBlur={event => {
-                                                    setStatusEditNamaKategori(false)
-                                                    handleUpdateNamaKategori(item.Id, event.target.value)
-                                                }}
-                                                onFocus={() => {
-                                                    setStatusEditNamaKategori(true)
-                                                    setKategoriId(item.Id)
-                                                    setKategoriNamaEdit(item.NamaKategori)
-                                                }}
-                                            />
+                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.Nama}</td>
+                                        <td style={{ paddingTop:20, paddingBottom:20, color:item.Id === IdIndex && isHoveringNoEdit && item.Status !== 0 ? '#004372' : '#546E7A', textAlign:'left' }}>{item.Username}</td>
+                                        <td style={{ textAlign:'left' }}>{item.Role}</td>                             
+                                        <td style={{ textAlign:'left' }}>{item.TanggalInput}</td>
+                                        <td>
+                                            {item.Username !== "admin_siam" &&
+                                            <FontAwesomeIcon icon={faUserPen} style={{ height:20, width:20, cursor:'pointer' }} onClick={() => {
+                                                history.push('update-admin-access')
+                                                setCookie('varUserId', item.Id)
+                                            }}/>}
                                         </td>
-                                        <td style={{ color:'#546E7A', paddingTop:20, paddingBottom:20 }} onMouseOut={handleMouseOut}>{item.TanggalInput}</td>
                                     </Tr>;
-                                }) : <Tr><td colSpan="9" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
+                                }) : <Tr><td colSpan="6" align="center" style={{ color:'red' }}>{"Data tidak ditemukan"}</td></Tr>
                                 }
                             </Tbody>
                         </Table>
 
                         <hr/>
-
-                        <Modal
-                            show={ModalAddNew}
-                            size="lg"
-                            aria-labelledby="contained-modal-title-vcenter"
-                            centered
-                            style={{ borderRadius:10}}
-                            >
-                            <Modal.Body>
-                                <Gap height={20} />
-
-                                <h3>Add New Category</h3>
-
-                                <hr />
-
-                                <div>
-                                    <div style={{ fontSize:16, fontWeight:'bold', marginBottom:10, color:'#61308C' }}>Nama Category</div>
-                                    <div>
-                                        <Input
-                                            required
-                                            value={NamaKategoriModal}
-                                            onChange={event => setNamaKategoriModal(event.target.value)}
-                                        />
-                                    </div>
-                                </div>
-
-                            </Modal.Body>
-
-                            <Gap height={20} />
-                            
-                            <div style={{ display:'flex', justifyContent:'flex-end', padding:15, alignItems:'center' }}>
-                                <div style={{ color:'#B4C1C8', marginRight:20, fontSize:20, cursor:'pointer' }} onClick={() => setModalAddNew(false)}>Cancel</div>
-                                <div style={{ backgroundColor:'#3A379F', borderTopLeftRadius:8, borderTopRightRadius:8, borderBottomLeftRadius:8, borderBottomRightRadius:8, padding:10, width:150 }}>
-                                    <div style={{ color:'#FFFFFF', textAlign:'center', fontWeight:'bold', cursor:'pointer' }} 
-                                    onClick={() => inputKategori()}
-                                    >Save Changes</div>
-                                </div>
-                            </div>
-                        </Modal>
 
                         <div 
                             style={{
@@ -754,4 +596,4 @@ const Category = () => {
     )
 }
 
-export default Category;
+export default AdminAccess;

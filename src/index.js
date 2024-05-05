@@ -4,14 +4,11 @@ import './index.css';
 import App from './pages/App';
 import reportWebVitals from './reportWebVitals';
 import { CookiesProvider } from "react-cookie";
-import { ProSidebarProvider } from "react-pro-sidebar";
 
 ReactDOM.render(
   <React.StrictMode>
     <CookiesProvider>
-      <ProSidebarProvider>
-        <App />
-      </ProSidebarProvider>
+      <App />
     </CookiesProvider>
   </React.StrictMode>,
   document.getElementById('root')

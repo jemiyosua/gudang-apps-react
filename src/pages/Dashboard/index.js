@@ -44,13 +44,13 @@ const Dashboard = () => {
         var SecretCookie = cookies.varCookie;
         if (SecretCookie !== "" && SecretCookie != null && typeof SecretCookie=="string") {
             var LongSecretCookie = SecretCookie.split("|");
-            var Username = LongSecretCookie[0];
+            var UserName = LongSecretCookie[0];
             var ParamKeyArray = LongSecretCookie[1];
             var Nama = LongSecretCookie[2];
             var ParamKey = ParamKeyArray.substring(0, ParamKeyArray.length)
         
             if (tipe === "username") {
-                return Username;            
+                return UserName;            
             } else if (tipe === "paramkey") {
                 return ParamKey;
             } else if (tipe === "nama") {
