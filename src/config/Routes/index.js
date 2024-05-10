@@ -1,14 +1,14 @@
 import React, { useEffect } from 'react';
 import { useCookies } from 'react-cookie';
 import { useSelector } from 'react-redux';
-import { BrowserRouter as Router, Route, Switch } from 'react-router-dom';
+import { BrowserRouter, Route, Switch } from 'react-router-dom';
 import Login from '../../pages/Login';
 import MainApp from '../../pages/MainApp';
 // import MainApp from '../../admin/pages/MainApp';
 
 const Routes = () => {
     return (
-		<Router >
+		<BrowserRouter>
 			<Switch>
 				<Route path='/admin/Login'>
 					<Login/>
@@ -16,28 +16,28 @@ const Routes = () => {
 				<Route path='/admin/dashboard'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/master-data'>
+				<Route path='/admin/gudang'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/main'>
+				<Route path='/admin/kasir'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/student'>
+				<Route path='/admin/keuangan'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/user'>
+				<Route path='/admin/other'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/input-admin-access'>
+				<Route path='/admin/gudang/import-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/update-admin-access'>
+				<Route path='/admin/gudang/scan-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/input-role-access'>
+				<Route path='/admin/gudang/stok-product'>
 					<MainApp/>
 				</Route>
-				<Route path='/admin/update-role-access'>
+				<Route path='/admin/other/category'>
 					<MainApp/>
 				</Route>
 				{/* <Route path='/:post'>
@@ -47,7 +47,7 @@ const Routes = () => {
 					<Login/>
 				</Route>
 			</Switch>
-		</Router>
+		</BrowserRouter>
     )
 }
 

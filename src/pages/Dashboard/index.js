@@ -38,19 +38,30 @@ const Dashboard = () => {
         var CookieNama = getCookie("nama");
         setName(CookieNama)
 
+		var CookieParamKey = getCookie("paramkey");
+        var CookieUsername = getCookie("username");
+        
+        if (CookieParamKey === null || CookieParamKey === "" || CookieUsername === null || CookieUsername === ""){
+            window.location.href="admin/login";
+        }else{
+            dispatch(setForm("ParamKey",CookieParamKey))
+            dispatch(setForm("Username",CookieUsername))
+            dispatch(setForm("PageActive","DASHBOARD"))
+        }
+
     },[])
 
 	const getCookie = (tipe) => {
         var SecretCookie = cookies.varCookie;
         if (SecretCookie !== "" && SecretCookie != null && typeof SecretCookie=="string") {
             var LongSecretCookie = SecretCookie.split("|");
-            var UserName = LongSecretCookie[0];
+            var Username = LongSecretCookie[0];
             var ParamKeyArray = LongSecretCookie[1];
             var Nama = LongSecretCookie[2];
             var ParamKey = ParamKeyArray.substring(0, ParamKeyArray.length)
         
             if (tipe === "username") {
-                return UserName;            
+                return Username;            
             } else if (tipe === "paramkey") {
                 return ParamKey;
             } else if (tipe === "nama") {
